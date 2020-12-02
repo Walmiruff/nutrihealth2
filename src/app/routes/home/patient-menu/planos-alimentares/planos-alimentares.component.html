@@ -1,0 +1,347 @@
+<div id="planos-alimentares">
+  <div class="card-stnd">
+    <div class="card">
+      <div class="color card-top flex align-items-center justfy-content-center">
+        <h4>Planos <br> Alimentares </h4>
+      </div>
+      <div class=""></div>
+      <div class="card-body">
+        <div class="container">
+          <div class="row">
+            <div class="col-md-4 mr-3">
+              <div class="row">
+                <div class="col-sm-12 mb-3">
+                  <label for="desc">Descrição*</label>
+                  <textarea class="form-control note-editor note-editor-margin" cols="30" rows="10"
+                    maxlength="200"></textarea>
+                  <small>
+                    Caracteres restantes
+                    <span>200</span>
+                  </small>
+                  <!-- <app-error-msg [control]="formularioPrincipal.get('desc')" label="Descrição"></app-error-msg> -->
+                </div>
+              </div>
+            </div>
+            <div class="col-md-7">
+              <div class="flex space-between">
+                <label for="desc">Refeições</label>
+                <div>
+                  <button type="submit" class="btn btn-success  mr-2"
+                    (click)="classicModal.show(); clearModalRef()">Adicionar</button>
+                  <div class="btn-group mb-1 mr-1" dropdown>
+                    <button class="btn dropdown-toggle btn-info" type="button" dropdownToggle>Importar
+                      <span class="caret"></span>
+                    </button>
+                    <div *dropdownMenu class="dropdown-menu" role="menu">
+                      <a class="dropdown-item" (click)="modelosModal.show(); loadModelosPlanosAlim()">Modelo</a>
+                      <a class="dropdown-item">Recordatório</a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!--Refeiçoes-->
+              <div *ngIf="refeicoes$ | async as refs">
+                <div class="row mb-4" *ngFor="let ref of refs">
+                  <div class="col-sm-4">
+                    {{ ref.horario }} - {{ ref.descricao }}
+                    <div class="row mt-2">
+                      <div class="col-sm-12">
+                        <em class="fa mr-2 fas fa-edit" (click)="updateRef(ref.id, false); classicModal.show()"></em>
+                        <em class="fa mr-2 fas fa-trash" (click)="deleteRef(ref.id)"></em>
+                        <em class="fa mr-2 fas fa-copy" (click)="updateRef(ref.id, true); classicModal.show()"></em>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-sm-8">
+                    <ul *ngFor="let alim of ref.alimentos | primOrSecOp: 1">
+                      <li>
+                        <a>{{ alim.descricao }} - </a>
+                        <span>{{ alim.porcao }}</span>
+                      </li>
+                    </ul>
+                    <p *ngIf="hasSecondOption(ref.alimentos)"><strong>Segunda Opção</strong></p>
+                    <ul *ngFor="let alim of ref.alimentos | primOrSecOp: 2">
+                      <li>
+                        <a>{{ alim.descricao }} - </a>
+                        <span>{{ alim.porcao }}</span>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card-footer flex flex-end">
+        <button class="btn btn-outline-danger mr-2">Cancelar</button>
+        <button class="btn btn-primary" (click)="saveOrUpdatePA()">Salvar</button>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!--Modal Ref-->
+<div class="modal fade" bsModal #classicModal="bs-modal" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel"
+  aria-hidden="true" [hidden]="hiddenModalRef" [config]="{ignoreBackdropClick: true, keyboard: false}">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Refeição</h4>
+        <button type="button" class="close" aria-label="Close" (click)="classicModal.hide()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body" style="overflow-y: auto;">
+        <form [formGroup]="formModalRef">
+          <div class="container">
+
+            <div class="row" style="max-width: 496px;">
+              <div class="col-sm-5 form-group">
+                <label class="col-form-label">Horário*</label>
+                <input class="form-control" id="horarioRefeicao" formControlName="horarioRefeicao" type="time"
+                  placeholder="hh:mm" />
+              </div>
+              <div class="col-sm-7 form-group">
+                <label class="col-form-label">Descrição*</label>
+                <select id="tipoRefeicao" class="form-control" formControlName="tipoRefeicao" id="tipoRefeicao">
+                  <option value="Café da Manhã">Café da Manhã</option>
+                  <option value="Lanche da Manhã">Lanche da Manhã</option>
+                  <option value="Almoço">Almoço</option>
+                  <option value="Lanche da Tarde">Lanche da Tarde</option>
+                  <option value="Jantar">Jantar</option>
+                  <option value="Lanche da Noite">Lanche da Noite</option>
+                  <option value="Lanche Extra 1">Lanche Extra 1</option>
+                  <option value="Lanche Extra 2">Lanche Extra 2</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="row mt-2">
+              <div class="col-12">
+                <label class="col-form-label">Observação</label>
+                <textarea id="observacaoRefeicao" formControlName="observacaoRefeicao" class="form-control"
+                  maxlength="500"></textarea>
+                <small>Caracteres restantes <span id="caract-observacao-refeicao">500</span></small>
+              </div>
+            </div>
+
+            <div class="d-flex justify-content-between mt-5">
+              <div class="row">
+                <div class="col-12">
+                  <h5>Alimentos Selecionados</h5>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-12">
+                  <div *ngIf="alimStorePrimary$ | async as alims">
+                    <div *ngFor="let alim of alims">
+                      <div class="row">
+                        <div class="col-5">
+                          <p>{{ alim.descricao }} ( {{ alim.porcao }} : {{alim.quantidade}} )</p>
+                        </div>
+                        <div class="col-7">
+                          <div class="row">
+                            <button type="button" class="btn btn-success"
+                              (click)="updateAlim(alim.id); smModal.show(); modalHiddenRef(); addOptionFalse()">Editar</button>
+                            <button type="button" class="btn btn-secondary ml-2"
+                              (click)="removeAlim(alim.idAlimento)">Remover</button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+                <div class="row">
+                  <div class="col-12">
+                    <div *ngIf="alimStoreSecond$ | async as alims">
+                      <p *ngIf="alims.length > 0"><strong>Segunda Opção</strong></p>
+                      <div *ngFor="let alim of alims">
+                        <div class="row">
+                          <div class="col-5">
+                            <p>{{ alim.descricao }} ( {{ alim.porcao }} : {{alim.quantidade}} )</p>
+                          </div>
+                          <div class="col-7">
+                            <div class="row">
+                              <button type="button" class="btn btn-success"
+                                (click)="updateAlim(alim.id); smModal.show(); modalHiddenRef(); addOption()">Editar</button>
+                              <button type="button" class="btn btn-secondary ml-2"
+                                (click)="removeAlim(alim.idAlimento)">Remover</button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <button type="button" class="mr-1 mb-1 btn btn-outline-primary"
+                (click)="smModal.show(); modalHiddenRef(); clearModalAlim(); addOptionFalse()">+
+                Adicionar Alimento</button>
+
+            </div>
+        </form>
+      </div>
+      <div class="flex space-between modal-footer">
+        <div>
+          <button type="button" class="btn btn-success"
+            (click)="smModal.show(); modalHiddenRef(); clearModalAlim(); addOption()">+Add Opção</button>
+        </div>
+        <div>
+          <button type="button" class="btn btn-secondary mr-2" data-dismiss="modal"
+            (click)="classicModal.hide()">Cancelar</button>
+          <button type="button" class="btn btn-primary"
+            (click)="classicModal.hide();smModal.hide(); saveOrUpdateRef()">Salvar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!--Modal Alim-->
+<div bsModal #smModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel"
+  aria-hidden="true" [config]="{ignoreBackdropClick: true, keyboard: false}">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Adicionar Alimento</h4>
+        <button type="button" class="close" aria-label="Close" (click)="smModal.hide(); modalHiddenRef()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <!--Start Tabela Alimentos-->
+        <form [formGroup]="formModalAlim">
+          <div class="row mt-4">
+            <div class="col-12">
+              <div class="row">
+                <div class="col-sm-2">
+                  Tabela de Alimentos
+                </div>
+                <div class="col-sm-10">
+                  <div class="form-check-label" *ngFor="let item of tabelas">
+                    <label class="form-check-label mr-3">
+                      <input type="radio" class="form-check-input" [value]="item.valor" formControlName="tabelas" />
+                      {{ item.nome }}
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+
+          <div *ngIf="alimentos$ | async as alimentos">
+            <div class="row mt-3">
+              <div class="col-6">
+                <label>Alimento</label>
+                <select class="form-control" formControlName="alimento" id="alimento">
+                  <option *ngFor="let alim of alimentos" [value]="alim.id">{{ alim.descricao }}</option>
+                </select>
+              </div>
+              <div class="col-6">
+                <button id="btn-novo-alim" class="btn btn-link" (click)="novaPorcao()" disabled>Cadastrar Novo
+                  Alimento</button>
+              </div>
+            </div>
+
+            <div class="row mt-3">
+              <div class="col-6">
+                <label>Porção</label>
+                <select class="form-control" formControlName="porcoes" id="porcoes">
+                  <option *ngFor="let porcao of porcoes" [value]="porcao.gramas + '-' + porcao.descricao">
+                    {{ porcao.descricao }}
+                  </option>
+                </select>
+              </div>
+              <div class="col-6">
+                <button id="btn-nova-porcao" class="btn btn-link" (click)="porcaoModal.show()">Cadastrar Nova
+                  Porção</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="row mt-3 mb-4">
+            <div class="col-4">
+              <label>Quantidade</label>
+              <input type="text" class="form-control" formControlName="quantidade" id="quantidade">
+            </div>
+          </div>
+
+        </form>
+        <!--End Tabela Alimentos-->
+
+      </div>
+      <div class="modal-footer">
+        <button id="btn-mostrar-nutrientes-alimento" type="button" class="btn btn-info disabled">Mostrar
+          Nutrientes</button>
+        <button id="btn-add-alimento-continuar" type="button" class="btn btn-primary disabled"
+          (click)="saveAlim()">Incluir e
+          Continuar</button>
+        <button id="btn-add-alimento-fechar" type="button" class="btn btn-success disabled"
+          (click)="saveAlim(); smModal.hide(); modalHiddenRef()">Incluir e Fechar</button>
+        <button type="button" class="btn btn-default" (click)="smModal.hide(); modalHiddenRef()">Fechar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!--Moda cadastro porcoes-->
+<div bsModal #porcaoModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel"
+  aria-hidden="true" [config]="{ignoreBackdropClick: true, keyboard: false}">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Nova Porção</h4>
+        <button type="button" class="close" aria-label="Close" (click)="porcaoModal.hide()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form [formGroup]="formPorcao">
+          <input type="text" class="form-control" formControlName="descricao" placeholder="Colher, xícara, copo..."
+            id="desc">
+          <input type="text" class="form-control" formControlName="gramas" placeholder="g" id="gramas">
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary mr-2" (click)="porcaoModal.hide()">Cancelar</button>
+        <button type="button" class="btn btn-secondary" (click)="porcaoModal.hide(); onConfirm()"
+          data-dismiss="modal">Salvar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!--Modal modelo-->
+<div bsModal #modelosModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel"
+  aria-hidden="true" [config]="{ignoreBackdropClick: true, keyboard: false}">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Cardápios Pré-Cadastrados</h4>
+        <button type="button" class="close" aria-label="Close" (click)="modelosModal.hide()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div *ngIf="modeloPlanoAlim$ | async as modeloPlanoAlims">
+          <ul *ngFor="let modeloPlano of modeloPlanoAlims">
+            <li>
+              <span (click)="findModeloPlanoAlim(modeloPlano.id); modelosModal.hide()">{{ modeloPlano.nome }}</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary mr-2" (click)="modelosModal.hide()">Cancelar</button>
+      </div>
+    </div>
+  </div>
+</div>
