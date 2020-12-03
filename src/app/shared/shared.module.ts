@@ -38,7 +38,8 @@ import { ErrorMsgComponent } from './error-msg/error-msg.component';
 import { ModalConfirmComponent } from './components/modal-confirm/modal-confirm.component';
 import { ModalPorcoesComponent } from './components/modal-porcoes/modal-porcoes.component';
 import { ModalCrudAlimComponent } from './components/modal-crud-alim/modal-crud-alim.component';
-
+import { ModalInfoAlimComponent } from './components/modal-info-alim/modal-info-alim.component';
+ 
 // https://angular.io/styleguide#!#04-10
 @NgModule({
     imports: [
@@ -81,7 +82,8 @@ import { ModalCrudAlimComponent } from './components/modal-crud-alim/modal-crud-
         ErrorMsgComponent,
         ModalConfirmComponent,
         ModalPorcoesComponent,
-        ModalCrudAlimComponent
+        ModalCrudAlimComponent,
+        ModalInfoAlimComponent
     ],
     exports: [
         CommonModule,
@@ -121,7 +123,8 @@ import { ModalCrudAlimComponent } from './components/modal-crud-alim/modal-crud-
     entryComponents: [
         ModalConfirmComponent,
         ModalPorcoesComponent,
-        ModalCrudAlimComponent
+        ModalCrudAlimComponent,
+        ModalInfoAlimComponent
     ]
 })
 

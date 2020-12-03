@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
-import { shareReplay } from 'rxjs/operators';
+import { map, shareReplay } from 'rxjs/operators';
 
 import { IRefeicao } from '../models/refeicao.model';
+import { IAlimento } from '../models/alimentos.model';
 
 
 @Injectable({
@@ -29,8 +30,8 @@ export class RefeicaoStore {
     }
 
     public removeAll(): void {
-       this.refs.splice(0);
-       this.refsSource.next(this.refs);
+        this.refs.splice(0);
+        this.refsSource.next(this.refs);
     }
 
     public update(ref: IRefeicao): void {
@@ -41,6 +42,24 @@ export class RefeicaoStore {
 
     public getId(refId: number | string): IRefeicao {
         return this.refs.find((element) => element.id === refId);
+    }
+
+    public findAlimInRefStore(idAlim: string): IAlimento {
+        let alim: IAlimento;
+        this.refs$
+            .pipe(
+                map((refs) => refs
+                    .map(ref => ref.alimentos
+                        .filter(alim => alim.idAlimento === idAlim))),
+            )
+            .subscribe((alimsFiltered => {
+                alimsFiltered.map((alimFiltered => {
+                    if (alimFiltered.length > 0) {
+                        alim = alimFiltered[0];
+                    }
+                }));
+            }));
+        return alim;
     }
 
 }

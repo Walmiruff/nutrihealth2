@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder } from '@angular/forms';
-import { Router, ActivatedRoute } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { v4 as uuid } from 'uuid';
 import { Observable } from 'rxjs';
 import { switchMap, map, filter, tap, take, delay, shareReplay } from 'rxjs/operators';
@@ -175,6 +175,10 @@ export class PlanosAlimentaresComponent implements OnInit {
 
   public novaPorcao(): void {
     this.modalService.showModalAlim();
+  }
+
+  public showAlimInfo(id: string): void {
+     this.modalService.showModalInfoAlim(id);
   }
 
   public saveAlim(): void {

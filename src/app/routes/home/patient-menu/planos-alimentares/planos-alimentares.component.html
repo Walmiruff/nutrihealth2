@@ -54,14 +54,14 @@
                   </div>
                   <div class="col-sm-8">
                     <ul *ngFor="let alim of ref.alimentos | primOrSecOp: 1">
-                      <li>
+                      <li (click)="showAlimInfo(alim.idAlimento)">
                         <a>{{ alim.descricao }} - </a>
                         <span>{{ alim.porcao }}</span>
                       </li>
                     </ul>
                     <p *ngIf="hasSecondOption(ref.alimentos)"><strong>Segunda Opção</strong></p>
                     <ul *ngFor="let alim of ref.alimentos | primOrSecOp: 2">
-                      <li>
+                      <li (click)="showAlimInfo(alim.idAlimento)">
                         <a>{{ alim.descricao }} - </a>
                         <span>{{ alim.porcao }}</span>
                       </li>
