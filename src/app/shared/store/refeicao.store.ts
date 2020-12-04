@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, concat } from 'rxjs';
-import { map, tap, shareReplay } from 'rxjs/operators';
+import { BehaviorSubject } from 'rxjs';
+import { map, tap, shareReplay, switchMap } from 'rxjs/operators';
 
 import { IRefeicao } from '../models/refeicao.model';
 import { IAlimento } from '../models/alimentos.model';
@@ -108,21 +108,49 @@ export class RefeicaoStore {
         this.refs$.pipe(
             map(refs => refs.filter(ref => ref.descricao === 'Café da Manhã')),
             map(refs => refs.map(ref => ref.alimentos.map(alim => refeicao.cafe += alim.calorias))),
-        ).subscribe(() => {
-            this.refs$.pipe(
-                map(refs => refs.filter(ref => ref.descricao === 'Lanche da Manhã')),
-                map(refs => refs.map(ref => ref.alimentos.map(alim => refeicao.lancheManha += alim.calorias))),
-            ).subscribe(() => {
-                this.refs$.pipe(
-                    map(refs => refs.filter(ref => ref.descricao === 'Almoço')),
-                    map(refs => refs.map(ref => ref.alimentos.map(alim => refeicao.almoco += alim.calorias))),
-                ).subscribe(() => this.distEnergRefSource.next(refeicao));
-            });
-        });
-
-        
-
-
+            switchMap(() => {
+                return this.refs$.pipe(
+                    map(refs => refs.filter(ref => ref.descricao === 'Lanche da Manhã')),
+                    map(refs => refs.map(ref => ref.alimentos.map(alim => refeicao.lancheManha += alim.calorias))),
+                    switchMap(() => {
+                        return this.refs$.pipe(
+                            map(refs => refs.filter(ref => ref.descricao === 'Almoço')),
+                            map(refs => refs.map(ref => ref.alimentos.map(alim => refeicao.almoco += alim.calorias))),
+                            switchMap(() => {
+                                return this.refs$.pipe(
+                                    map(refs => refs.filter(ref => ref.descricao === 'Lanche da Tarde')),
+                                    map(refs => refs.map(ref => ref.alimentos.map(alim => refeicao.lancheTarde += alim.calorias))),
+                                    switchMap(() => {
+                                        return this.refs$.pipe(
+                                            map(refs => refs.filter(ref => ref.descricao === 'Jantar')),
+                                            map(refs => refs.map(ref => ref.alimentos.map(alim => refeicao.jantar += alim.calorias))),
+                                            switchMap(() => {
+                                                return this.refs$.pipe(
+                                                    map(refs => refs.filter(ref => ref.descricao === 'Lanche da Noite')),
+                                                    map(refs => refs.map(ref => ref.alimentos.map(alim => refeicao.lancheNoite += alim.calorias))),
+                                                    switchMap(() => {
+                                                        return this.refs$.pipe(
+                                                            map(refs => refs.filter(ref => ref.descricao === 'Lanche Extra 1')),
+                                                            map(refs => refs.map(ref => ref.alimentos.map(alim => refeicao.lancheExtra1 += alim.calorias))),
+                                                            switchMap(() => {
+                                                                return this.refs$.pipe(
+                                                                    map(refs => refs.filter(ref => ref.descricao === 'Lanche Extra 2')),
+                                                                    map(refs => refs.map(ref => ref.alimentos.map(alim => refeicao.lancheExtra2 += alim.calorias))),
+                                                                );
+                                                            }),
+                                                        );
+                                                    }),
+                                                );
+                                            }),
+                                        );
+                                    }),
+                                );
+                            }),
+                        );
+                    }),
+                );
+            })
+        ).subscribe(() => this.distEnergRefSource.next(refeicao));
     }
 
     public calcNutrientes(): void {
