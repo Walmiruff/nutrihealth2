@@ -81,6 +81,8 @@ export class PlanosAlimentaresComponent implements OnInit {
 
     this.refeicaoStore.refs$.subscribe((refs) => console.log('refs', refs));
     this.alimStore.alims$.subscribe((alims) => console.log('alims', alims));
+    this.refeicaoStore.macro$.subscribe((macro) => console.log('macro', macro));
+    this.refeicaoStore.distEnergRef$.subscribe((distEnergRef) => console.log('distEnergRef', distEnergRef));
   }
 
   public modalHiddenRef(): void {

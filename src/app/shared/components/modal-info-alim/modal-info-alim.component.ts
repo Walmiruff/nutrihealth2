@@ -24,8 +24,7 @@ export class ModalInfoAlimComponent implements OnInit {
   ngOnInit() {
     setTimeout(() => {
       this.alim$.next(this.refeicaoStore.findAlimInRefStore(this.idAlim));
-    }, 300);
-
+    }, 600);
   }
 
   onClose() {
