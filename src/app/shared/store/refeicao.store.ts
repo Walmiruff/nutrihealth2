@@ -62,4 +62,16 @@ export class RefeicaoStore {
         return alim;
     }
 
+    public calcMacro(): void {
+
+    }
+
+    public calcNutrientes(): void {
+        
+    }
+
+    public distEnergRef(): void {
+        
+    }
+
 }
